@@ -1,0 +1,21 @@
+#!/bin/bash
+
+GIT=/usr/local/bin/git
+MODULE=$1
+
+if [ -z "$MODULE" ]; then
+	echo "$0: no CVS module declared"
+	exit 1
+fi
+
+if [ -z "$CVSROOT" ]; then
+	echo "$0: CVSROOT not set"
+	exit 1
+fi
+
+cd $HOME/git
+unset GIT_DIR
+$GIT cvsimport -v -i -k -a -d $CVSROOT -r cvs -C ${MODULE}_cvs $MODULE
+cd $HOME/git/${MODULE}_cvs
+$GIT update-ref HEAD refs/remotes/cvs/master
+

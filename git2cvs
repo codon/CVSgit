@@ -1,0 +1,18 @@
+#!/bin/bash
+
+SED=/bin/sed
+XARGS=/usr/bin/xargs
+CVS=/usr/bin/cvs
+GIT=/usr/local/bin/git
+
+MODULE=$1
+cd $HOME/cvs/$MODULE
+$CVS up
+if [ 0 != $? ]; then
+	exit $?
+fi
+
+export GIT_DIR=$HOME/git/$MODULE/.git
+$GIT cherry cvs/master master | $SED 's/^+ //' | $XARGS -l1 $GIT cvsexportcommit -c -p -v
+$GIT update-ref cvs/HEAD refs/heads/master
+
