@@ -6,6 +6,12 @@ CVS=/usr/bin/cvs
 GIT=/usr/local/bin/git
 
 MODULE=$1
+
+if [ -z "$MODULE" ]; then
+	echo "$0: no CVS module declared"
+	exit 1
+fi
+
 cd $HOME/cvs/$MODULE
 $CVS up
 if [ 0 != $? ]; then
