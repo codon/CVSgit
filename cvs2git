@@ -18,4 +18,8 @@ unset GIT_DIR
 $GIT cvsimport -v -i -k -a -d $CVSROOT -r cvs -C ${MODULE}_cvs $MODULE
 cd $HOME/git/${MODULE}_cvs
 $GIT update-ref HEAD refs/remotes/cvs/master
-
+$GIT stash save 'pre cvs2git'
+$GIT fetch
+$GIT pull cvs master
+$GIT reset --hard cvs/master
+$GIT stash pop
