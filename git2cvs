@@ -20,5 +20,3 @@ fi
 
 export GIT_DIR=$HOME/git/$MODULE/.git
 $GIT cherry cvs/master master | $SED 's/^+ //' | $XARGS -l1 $GIT cvsexportcommit -c -p -v
-# $GIT update-ref cvs/HEAD refs/heads/master
-
