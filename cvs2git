@@ -13,11 +13,22 @@ if [ -z "$CVSROOT" ]; then
 	exit 1
 fi
 
+if [ ! -d "$HOME/cvs/$MODULE" ]; then
+	cd $HOME/cvs
+	cvs -d $CVSROOT co $MODULE
+fi
+
 cd $HOME/git
 unset GIT_DIR
 $GIT cvsimport -v -i -k -a -d $CVSROOT -r cvs -C ${MODULE}_cvs $MODULE
 cd $HOME/git/${MODULE}_cvs
 $GIT update-ref HEAD refs/remotes/cvs/master
+
+if [ ! -d "$HOME/git/$MODULE" ]; then
+	cd $HOME/git
+	git clone -l -o cvs ${MODULE}_cvs $MODULE
+fi
+
 cd $HOME/git/${MODULE}
 $GIT stash save 'pre cvs2git'
 $GIT fetch
