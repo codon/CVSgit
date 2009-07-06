@@ -1,0 +1,33 @@
+=====
+ABOUT
+-----
+This uses a local checkout of a CVS module, a bare "remote" Git/CVS repository, and a working Git repository.
+The workflow is to pull CVS updates into the bare Git/CVS repository, then pull those changes into the working
+repository. Changes are worked on and committed to the working repository, but *NOT* pushed up to the Git/CVS
+repository. Instead, the changes are identified and pushed to CVS through the local CVS checkout. These 
+changes are then imported back into the remote Git/CVS repository and merged back into the local repository.
+Finally, the local index is reset to be in sync with the remote master.
+
+Any in-flight work in the local repository is preserved by using git stash prior to pulling from the remote
+and then re-applied after the index is reset.
+
+===========
+BASIC USAGE
+-----------
+# Pull a CVS module into a local Git repository
+cvs2git $module
+
+# To push changes committed to Git into an upstream CVS module
+git2cvs $module
+
+============
+REQUIREMENTS
+------------
+You should have the following directories set up:
+~/git/
+~/cvs/
+
+====
+BUGS
+----
+None that I currently know of. Please contact me if you find any.
