@@ -13,7 +13,7 @@ if [ -z "$MODULE" ]; then
 fi
 
 cd $HOME/cvs/$MODULE
-$CVS up
+$CVS up -dP
 if [ 0 != $? ]; then
 	exit $?
 fi
