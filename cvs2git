@@ -30,8 +30,15 @@ if [ ! -d "$HOME/git/$MODULE" ]; then
 fi
 
 cd $HOME/git/${MODULE}
-$GIT stash save 'pre cvs2git'
+
+STASH=$( $GIT ls-files -cdmskut --directory )
+if [ -n "$STASH" ]; then
+	$GIT stash save 'pre cvs2git'
+fi
+
 $GIT fetch
 $GIT pull cvs master
 $GIT reset --hard cvs/master
-$GIT stash pop
+if [ -n "$STASH" ]; then
+	$GIT stash pop
+fi
