@@ -9,6 +9,10 @@ case $1 in
 esac
 
 MODULE=$1
+BRANCH="master"
+if [ ! -z "$2" ]; then
+	BRANCH=$2
+fi
 
 for path in /bin /usr/bin /usr/local/bin ; do
 	if [ -f "$path/sed" ] ; then
@@ -40,11 +44,11 @@ if [ -z "$MODULE" ]; then
 	exit 1
 fi
 
-cd $HOME/cvs/$MODULE
+cd $HOME/cvs/${MODULE}_${BRANCH}
 $CVS up -dP
 if [ 0 != $? ]; then
 	exit $?
 fi
 
 export GIT_DIR=$HOME/git/$MODULE/.git
-$GIT cherry cvs/master master | $SED 's/^+ //' | $XARGS -l1 $GIT cvsexportcommit -c -p -v
+$GIT cherry cvs/${BRANCH} ${BRANCH} | $SED 's/^+ //' | $XARGS -l1 $GIT cvsexportcommit -c -p -v -w $HOME/cvs/${MODULE}_${BRANCH}

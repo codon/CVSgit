@@ -9,6 +9,13 @@ case $1 in
 esac
 
 MODULE=$1
+BRANCH="master"
+CVSBRANCH="HEAD"
+if [ ! -z "$2" ]; then
+	BRANCH=$2
+	CVSBRANCH=$BRANCH
+fi
+
 for path in /bin /usr/bin /usr/local/bin ; do
 	if [ -f "$path/sed" ] ; then
 		SED="$path/sed"
@@ -34,7 +41,6 @@ if [ -z "$CVS" ]; then
 	exit 1
 fi
 
-
 if [ -z "$MODULE" ]; then
 	echo "$0: no CVS module declared"
 	exit 1
@@ -45,18 +51,23 @@ if [ -z "$CVSROOT" ]; then
 	exit 1
 fi
 
-if [ ! -d "$HOME/cvs/$MODULE" ]; then
+if [ ! -d "$HOME/cvs/${MODULE}_${BRANCH}" ]; then
 	cd $HOME/cvs
-	$CVS -d $CVSROOT co $MODULE
+	$CVS -d $CVSROOT co -r ${CVSBRANCH} -d ${MODULE}_${BRANCH} $MODULE
 fi
 
+echo "Running cvsimport"
 cd $HOME/git
 unset GIT_DIR
 $GIT cvsimport -v -i -k -a -d $CVSROOT -r cvs -C ${MODULE}_cvs $MODULE
 cd $HOME/git/${MODULE}_cvs
 $GIT update-ref HEAD refs/remotes/cvs/master
+if [ -z "$($GIT branch | grep $BRANCH )" ]; then
+	$GIT branch -tf ${BRANCH} cvs/${BRANCH}
+fi
 
 if [ ! -d "$HOME/git/$MODULE" ]; then
+	echo "clone working git repo"
 	cd $HOME/git
 	$GIT clone -l -o cvs ${MODULE}_cvs $MODULE
 fi
@@ -65,12 +76,16 @@ cd $HOME/git/${MODULE}
 
 STASH=$( $GIT ls-files -cdmskut --directory )
 if [ -n "$STASH" ]; then
+	echo "stash local changes"
 	$GIT stash save 'pre cvs2git'
 fi
 
+echo "uppdate working git repo"
+$GIT checkout $BRANCH
 $GIT fetch
-$GIT pull cvs master
-$GIT reset --hard cvs/master
+$GIT pull cvs $BRANCH
+$GIT reset --hard cvs/$BRANCH
 if [ -n "$STASH" ]; then
+	echo "unstash local changes"
 	$GIT stash pop
 fi
