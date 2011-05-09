@@ -1,5 +1,13 @@
 #!/bin/bash
 
+case $1 in
+	-*)
+		echo "Usage:"
+		echo "	$0 [module]"
+		exit -1;
+		;;
+esac
+
 MODULE=$1
 
 for path in /bin /usr/bin /usr/local/bin ; do
