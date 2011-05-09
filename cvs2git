@@ -1,7 +1,31 @@
 #!/bin/bash
 
-GIT=/usr/local/bin/git
 MODULE=$1
+for path in /bin /usr/bin /usr/local/bin ; do
+	if [ -f "$path/sed" ] ; then
+		SED="$path/sed"
+	fi
+	if [ -f "$path/xargs" ] ; then
+		XARGS="$path/xargs"
+	fi
+	if [ -f "$path/git" ] ; then
+		GIT="$path/git"
+	fi
+	if [ -f "$path/cvs" ] ; then
+		CVS="$path/cvs"
+	fi
+done
+
+if [ -z "$GIT" ]; then
+	echo "$0: no git installation found"
+	exit 1
+fi
+
+if [ -z "$CVS" ]; then
+	echo "$0: no cvs installation found"
+	exit 1
+fi
+
 
 if [ -z "$MODULE" ]; then
 	echo "$0: no CVS module declared"
@@ -15,7 +39,7 @@ fi
 
 if [ ! -d "$HOME/cvs/$MODULE" ]; then
 	cd $HOME/cvs
-	cvs -d $CVSROOT co $MODULE
+	$CVS -d $CVSROOT co $MODULE
 fi
 
 cd $HOME/git
@@ -26,7 +50,7 @@ $GIT update-ref HEAD refs/remotes/cvs/master
 
 if [ ! -d "$HOME/git/$MODULE" ]; then
 	cd $HOME/git
-	git clone -l -o cvs ${MODULE}_cvs $MODULE
+	$GIT clone -l -o cvs ${MODULE}_cvs $MODULE
 fi
 
 cd $HOME/git/${MODULE}

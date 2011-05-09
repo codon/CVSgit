@@ -1,11 +1,31 @@
 #!/bin/bash
 
-SED=/bin/sed
-XARGS=/usr/bin/xargs
-CVS=/usr/bin/cvs
-GIT=/usr/local/bin/git
-
 MODULE=$1
+
+for path in /bin /usr/bin /usr/local/bin ; do
+	if [ -f "$path/sed" ] ; then
+		SED="$path/sed"
+	fi
+	if [ -f "$path/xargs" ] ; then
+		XARGS="$path/xargs"
+	fi
+	if [ -f "$path/git" ] ; then
+		GIT="$path/git"
+	fi
+	if [ -f "$path/cvs" ] ; then
+		CVS="$path/cvs"
+	fi
+done
+
+if [ -z "$GIT" ]; then
+	echo "$0: no git installation found"
+	exit 1
+fi
+
+if [ -z "$CVS" ]; then
+	echo "$0: no cvs installation found"
+	exit 1
+fi
 
 if [ -z "$MODULE" ]; then
 	echo "$0: no CVS module declared"
